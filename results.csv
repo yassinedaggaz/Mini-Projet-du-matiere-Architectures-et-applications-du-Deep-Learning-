@@ -1,0 +1,15 @@
+image,prediction,confidence,true_class,correct
+keyboard_0000.avif,monitor,36.42%,keyboard,False
+keyboard_0001.avif,keyboard,48.84%,keyboard,True
+keyboard_0002.jpg,keyboard,46.33%,keyboard,True
+laptop_0000.jpg,laptop,44.73%,laptop,True
+laptop_0001.jpg,mouse,39.67%,laptop,False
+laptop_0002.jpg,mouse,36.81%,laptop,False
+laptop_0003.jpg,monitor,45.32%,laptop,False
+monitor_0000.jpg,monitor,34.57%,monitor,True
+monitor_0001.jpg,monitor,46.83%,monitor,True
+monitor_0002.jpg,mouse,36.81%,monitor,False
+monitor_0003.jpg,monitor,48.30%,monitor,True
+mouse_0000.jpg,mouse,77.84%,mouse,True
+mouse_0001.jpg,laptop,31.50%,mouse,False
+mouse_0002.jpg,mouse,76.68%,mouse,True

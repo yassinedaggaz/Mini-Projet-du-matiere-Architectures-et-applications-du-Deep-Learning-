@@ -1,0 +1,6 @@
+{
+  "keyboard": 0,
+  "laptop": 1,
+  "monitor": 2,
+  "mouse": 3
+}
