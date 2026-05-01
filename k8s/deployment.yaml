@@ -1,0 +1,102 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Kubernetes Deployment — Deep Learning Image Classifier
+# ──────────────────────────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dl-classifier
+  namespace: dl-classifier
+  labels:
+    app: dl-classifier
+    version: "1.0.0"
+    component: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dl-classifier
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1          # one extra pod during update
+      maxUnavailable: 0    # zero downtime
+  template:
+    metadata:
+      labels:
+        app: dl-classifier
+        version: "1.0.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port:   "8000"
+        prometheus.io/path:   "/metrics"
+    spec:
+      # ── Security ────────────────────────────────────────────────────────────
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+
+      # ── Containers ──────────────────────────────────────────────────────────
+      containers:
+        - name: dl-classifier
+          # Replace with your Artifact Registry path:
+          # europe-west1-docker.pkg.dev/deeplearning-project-495018/dl-classifier/api:1.0.0
+          image: europe-west1-docker.pkg.dev/deeplearning-project-495018/dl-classifier/api:1.0.0
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+
+          # ── Environment variables ──────────────────────────────────────────
+          env:
+            - name: MODEL_PATH
+              value: "models/best_model.pth"
+            - name: CLASS_MAP_PATH
+              value: "models/class_to_idx.json"
+            - name: MODEL_VERSION
+              value: "1.0.0"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+
+          # ── Resource limits (CPU-only node) ────────────────────────────────
+          resources:
+            requests:
+              cpu: "500m"      # 0.5 vCPU guaranteed
+              memory: "1Gi"
+            limits:
+              cpu: "1000m"     # max 1 vCPU
+              memory: "2Gi"
+
+          # ── Probes ─────────────────────────────────────────────────────────
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30   # model takes ~10s to load
+            periodSeconds: 10
+            failureThreshold: 6       # 60 s total before giving up
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            failureThreshold: 3
+
+          # ── Security context ───────────────────────────────────────────────
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]

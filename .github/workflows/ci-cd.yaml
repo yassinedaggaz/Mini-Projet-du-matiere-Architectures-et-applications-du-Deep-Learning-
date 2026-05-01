@@ -1,0 +1,147 @@
+name: CI/CD — DL Image Classifier
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Required GitHub Secrets:
+#   GCP_PROJECT_ID       – your Google Cloud project ID
+#   GCP_SA_KEY           – JSON key of a Service Account with these roles:
+#                          Artifact Registry Writer, GKE Developer
+#   GKE_CLUSTER_NAME     – name of the GKE cluster
+#   GKE_CLUSTER_ZONE     – zone, e.g. europe-west1-b
+# ──────────────────────────────────────────────────────────────────────────────
+
+env:
+  REGION: europe-west1
+  REPO:   dl-classifier          # Artifact Registry repository name
+  IMAGE:  api
+
+jobs:
+  # ── 1. Test ───────────────────────────────────────────────────────────────
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install test dependencies
+        run: |
+          pip install --upgrade pip
+          pip install \
+            fastapi uvicorn[standard] python-multipart \
+            prometheus-client pydantic \
+            torch==2.2.0 torchvision==0.17.0 \
+            --extra-index-url https://download.pytorch.org/whl/cpu
+          pip install pytest httpx pillow
+
+      - name: Run pytest
+        run: pytest app/tests/ -v --tb=short
+
+  # ── 2. Build & Push Docker image ─────────────────────────────────────────
+  build:
+    name: 🐳 Build & Push Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Set image tag
+        id: tag
+        run: |
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          echo "TAG=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "FULL_IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:${SHORT_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg MODEL_VERSION=${{ steps.tag.outputs.TAG }} \
+            -t ${{ steps.tag.outputs.FULL_IMAGE }} \
+            -t ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:latest \
+            .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ steps.tag.outputs.FULL_IMAGE }}
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:latest
+
+      - name: Output image
+        run: echo "Pushed ${{ steps.tag.outputs.FULL_IMAGE }}"
+
+    outputs:
+      image_tag: ${{ steps.tag.outputs.TAG }}
+      full_image: ${{ steps.tag.outputs.FULL_IMAGE }}
+
+  # ── 3. Deploy to GKE ─────────────────────────────────────────────────────
+  deploy:
+    name: 🚀 Deploy to GKE
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER_NAME }}
+          location:     ${{ secrets.GKE_CLUSTER_ZONE }}
+
+      - name: Apply Kubernetes namespace
+        run: kubectl apply -f k8s/namespace.yaml
+
+      - name: Update image in deployment
+        run: |
+          sed -i "s|europe-west1-docker.pkg.dev/deeplearning-project-495018/dl-classifier/api:1.0.0|${{ needs.build.outputs.full_image }}|g" k8s/deployment.yaml
+
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -f k8s/hpa.yaml
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/dl-classifier \
+            -n dl-classifier \
+            --timeout=300s
+
+      - name: Show pod status
+        run: kubectl get pods -n dl-classifier -o wide

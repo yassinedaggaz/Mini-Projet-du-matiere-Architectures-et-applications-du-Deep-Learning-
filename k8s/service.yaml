@@ -1,0 +1,19 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Kubernetes Service — exposes the API pods internally
+# ──────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: dl-classifier-svc
+  namespace: dl-classifier
+  labels:
+    app: dl-classifier
+spec:
+  type: ClusterIP          # internal access; Ingress handles external traffic
+  selector:
+    app: dl-classifier
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80             # port exposed inside the cluster
+      targetPort: 8000     # port the container listens on

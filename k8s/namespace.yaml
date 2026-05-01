@@ -1,0 +1,9 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Kubernetes Namespace — isolate all resources
+# ──────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dl-classifier
+  labels:
+    app: dl-classifier

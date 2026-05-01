@@ -1,0 +1,44 @@
+# ── Git ────────────────────────────────────────────────────────
+.git
+.gitignore
+
+# ── Python caches ──────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# ── Virtual environment ────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Training data (NOT needed in the inference image) ─────────
+data/
+raw_images/
+
+# ── Notebook / dev artifacts ──────────────────────────────────
+*.ipynb
+outputs/
+results.csv
+
+# ── Kubernetes & CI (not needed at runtime) ───────────────────
+k8s/
+.github/
+
+# ── Source scripts (only app/ and models/ go into the image) ──
+src/
+
+# ── IDE / OS ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+
+# ── Docs ──────────────────────────────────────────────────────
+README.md
+DEPLOY.md

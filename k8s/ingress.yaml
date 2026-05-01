@@ -1,0 +1,48 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Kubernetes Ingress — routes external HTTP(S) to the classifier service
+# Requires: NGINX Ingress Controller installed in the cluster
+#   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+# ──────────────────────────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dl-classifier-ingress
+  namespace: dl-classifier
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"          # max upload size
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    # Uncomment for HTTPS with cert-manager:
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  # Uncomment + fill in for TLS:
+  # tls:
+  #   - hosts:
+  #       - classifier.yourdomain.com
+  #     secretName: dl-classifier-tls
+
+  rules:
+    # Option 1 – use with a real domain:
+    # - host: classifier.yourdomain.com
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: dl-classifier-svc
+    #             port:
+    #               number: 80
+
+    # Option 2 – no domain (IP-based, useful for testing):
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dl-classifier-svc
+                port:
+                  number: 80

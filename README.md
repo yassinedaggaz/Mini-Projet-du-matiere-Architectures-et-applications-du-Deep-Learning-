@@ -94,6 +94,8 @@ Le script va :
 python src/predict.py --image "chemin/vers/ton_image.jpg"
 ```
 
+python src/predict.py --image "C:\Users\YassineDaggaz\Downloads\images.jpg"
+
 Exemple de sortie :
 - Prediction: mouse
 - Confidence: 93.45%
