@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dl-api-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: dl-api
+  ports:
+  - port: 80
+    targetPort: 8000
