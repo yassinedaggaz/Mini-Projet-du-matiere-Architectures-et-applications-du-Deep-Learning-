@@ -1,6 +1,3 @@
 __pycache__/
 *.pyc
 .venv/
-models/*.pth
-outputs/*.png
-outputs/*.json
