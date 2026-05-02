@@ -1,0 +1,38 @@
+# Testing Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install dependencies + test tools (CPU-only PyTorch)
+RUN pip install --no-cache-dir \
+    -r requirements.txt \
+    pytest==7.4.0 \
+    pytest-cov==4.1.0 \
+    pytest-asyncio==0.21.0 \
+    httpx==0.24.1 \
+    --extra-index-url https://download.pytorch.org/whl/cpu
+
+# Copy application code
+COPY app/ ./app/
+COPY models/ ./models/
+
+# Create a non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+USER appuser
+
+# Environment variables
+ENV PYTHONUNBUFFERED=1
+ENV MODEL_PATH=/app/models/best_model.pth
+ENV CLASS_MAP_PATH=/app/models/class_to_idx.json
+
+# Run tests with coverage
+CMD ["pytest", "app/tests/", "-v", "--tb=short", "--cov=app", "--cov-report=term-missing", "--cov-report=html"]

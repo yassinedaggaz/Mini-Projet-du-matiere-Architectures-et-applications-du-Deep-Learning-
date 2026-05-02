@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classifier - Hardware Detection</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🖥️ Hardware Image Classifier</h1>
+            <p class="subtitle">Classify images into: Keyboard, Laptop, Monitor, or Mouse</p>
+            
+            <div class="upload-section">
+                <div class="drop-zone" id="dropZone">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <h3>Drop your image here</h3>
+                    <p>or click to select</p>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                </div>
+                
+                <div id="previewSection" class="preview-section" style="display: none;">
+                    <img id="preview" class="preview-image" alt="Preview">
+                    <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                </div>
+            </div>
+            
+            <button id="predictBtn" class="btn btn-primary" disabled>
+                <span id="btnText">Upload an image first</span>
+                <span id="spinner" class="spinner" style="display: none;"></span>
+            </button>
+            
+            <div id="resultSection" class="result-section" style="display: none;">
+                <div class="result-card">
+                    <h2>Prediction Result</h2>
+                    <div class="main-prediction">
+                        <div class="emoji" id="resultEmoji"></div>
+                        <div>
+                            <h3 id="predictionClass"></h3>
+                            <p class="confidence" id="confidence"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="top-predictions">
+                        <h4>Top 3 Predictions</h4>
+                        <div id="topPredictions"></div>
+                    </div>
+                    
+                    <div class="metadata">
+                        <small id="metadata"></small>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="errorSection" class="error-section" style="display: none;">
+                <p id="errorMessage"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const previewSection = document.getElementById('previewSection');
+        const predictBtn = document.getElementById('predictBtn');
+        const resultSection = document.getElementById('resultSection');
+        const errorSection = document.getElementById('errorSection');
+        const clearBtn = document.getElementById('clearBtn');
+        
+        const emojiMap = {
+            'keyboard': '⌨️',
+            'laptop': '💻',
+            'monitor': '🖥️',
+            'mouse': '🖱️'
+        };
+        
+        // File selection
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                displayImage(e.target.files[0]);
+            }
+        });
+        
+        // Drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                displayImage(files[0]);
+            }
+        });
+        
+        // Display image
+        function displayImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                previewSection.style.display = 'flex';
+                dropZone.style.display = 'none';
+                predictBtn.disabled = false;
+                predictBtn.innerHTML = '<span id="btnText">Predict</span>';
+                resultSection.style.display = 'none';
+                errorSection.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Clear selection
+        clearBtn.addEventListener('click', () => {
+            fileInput.value = '';
+            previewSection.style.display = 'none';
+            dropZone.style.display = 'flex';
+            predictBtn.disabled = true;
+            resultSection.style.display = 'none';
+            errorSection.style.display = 'none';
+        });
+        
+        // Make prediction
+        predictBtn.addEventListener('click', async () => {
+            if (!fileInput.files.length) return;
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            predictBtn.disabled = true;
+            document.getElementById('btnText').style.display = 'none';
+            //document.getElementById('spinner').style.display = 'inline-block';
+            errorSection.style.display = 'none';
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Prediction failed');
+                }
+                
+                const data = await response.json();
+                displayResult(data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').textContent = 
+                    '❌ Error: ' + error.message;
+                errorSection.style.display = 'block';
+            } finally {
+                predictBtn.disabled = false;
+                document.getElementById('btnText').style.display = 'inline';
+                document.getElementById('spinner').style.display = 'none';
+            }
+        });
+        
+        // Display results
+        function displayResult(data) {
+            const classLower = data.prediction.toLowerCase();
+            document.getElementById('resultEmoji').textContent = 
+                emojiMap[classLower] || '📦';
+            document.getElementById('predictionClass').textContent = 
+                data.prediction;
+            document.getElementById('confidence').textContent = 
+                `Confidence: ${data.confidence_pct}`;
+            
+            // Top predictions
+            const topPredDiv = document.getElementById('topPredictions');
+            topPredDiv.innerHTML = data.top_predictions.map((pred, idx) => {
+                const width = Math.round(pred.confidence * 100);
+                return `
+                    <div class="prediction-bar">
+                        <div class="bar-label">
+                            <span>${idx + 1}. ${pred.class_name}</span>
+                            <span>${(pred.confidence * 100).toFixed(2)}%</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: ${width}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Metadata
+            document.getElementById('metadata').textContent = 
+                `Model v${data.model_version} | Inference: ${data.inference_time_ms.toFixed(2)}ms`;
+            
+            resultSection.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

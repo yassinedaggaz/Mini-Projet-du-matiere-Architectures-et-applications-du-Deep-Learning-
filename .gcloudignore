@@ -1,0 +1,64 @@
+# .gcloudignore
+# Ignore files when deploying to Google Cloud
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.pytest_cache
+.coverage
+htmlcov/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Project specific
+.env
+.env.local
+outputs/
+raw_images/
+.notebooks
+*.ipynb
+
+# Docker build files
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Large files
+*.pth.bak
+*.h5.bak
+*.tar
+*.tar.gz
+*.zip
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Documentation
+README.md
+DEPLOYMENT.md
+QUICK_START.md
+CHANGES.md
+GCP_DEPLOYMENT.md
+*.md

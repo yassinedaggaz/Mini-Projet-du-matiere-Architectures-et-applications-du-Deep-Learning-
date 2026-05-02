@@ -1,0 +1,50 @@
+steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
+      - '-f'
+      - 'docker/Dockerfile.prod'
+      - '-t'
+      - 'gcr.io/deeplearning-project-495018/dl-classifier:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/deeplearning-project-495018/dl-classifier:latest'
+      - '.'
+    id: 'build-image'
+
+  # Step 2: Push to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'push'
+      - 'gcr.io/deeplearning-project-495018/dl-classifier:$SHORT_SHA'
+    id: 'push-image'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'push'
+      - 'gcr.io/deeplearning-project-495018/dl-classifier:latest'
+    id: 'push-latest'
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    args:
+      - run
+      - --filename=k8s/
+      - --image=gcr.io/deeplearning-project-495018/dl-classifier:$SHORT_SHA
+      - --location=us-central1
+      - --cluster=dl-classifier-cluster
+
+images:
+  - 'gcr.io/deeplearning-project-495018/dl-classifier:$SHORT_SHA'
+  - 'gcr.io/deeplearning-project-495018/dl-classifier:latest'
+
+options:
+  machineType: 'N1_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+  substitution_option: 'ALLOW_LOOSE'
+
+timeout: '1800s'
+
+substitutions:
+  _REGION: 'us-central1'
+  _SERVICE_NAME: 'dl-classifier'

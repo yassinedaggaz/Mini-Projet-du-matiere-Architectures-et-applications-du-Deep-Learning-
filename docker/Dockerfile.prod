@@ -1,0 +1,62 @@
+# Production Dockerfile - Optimized multi-stage build
+FROM python:3.11-slim AS builder
+
+WORKDIR /install
+
+# System build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install dependencies to a local directory (CPU-only PyTorch)
+RUN pip install --no-cache-dir --prefix=/install/pkg \
+    -r requirements.txt \
+    --extra-index-url https://download.pytorch.org/whl/cpu
+
+
+# Production runtime stage
+FROM python:3.11-slim
+
+LABEL maintainer="MLOps Team" \
+      version="1.0.0" \
+      description="ResNet18 Image Classifier API - Production"
+
+WORKDIR /app
+
+# System runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy installed packages from builder
+COPY --from=builder /install/pkg /usr/local
+
+# Copy application source
+COPY app/ ./app/
+COPY models/ ./models/
+
+# Create non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+USER appuser
+
+# Environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV MODEL_PATH=/app/models/best_model.pth
+ENV CLASS_MAP_PATH=/app/models/class_to_idx.json
+ENV LOG_LEVEL=INFO
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Expose port
+EXPOSE 8000
+
+# Run production server with multiple workers
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]

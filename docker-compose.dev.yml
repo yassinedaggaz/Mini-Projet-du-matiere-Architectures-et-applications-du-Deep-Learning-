@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: dl-api-dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./models:/app/models
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=DEBUG
+      - MODEL_PATH=/app/models/best_model.pth
+      - CLASS_MAP_PATH=/app/models/class_to_idx.json
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    driver: bridge

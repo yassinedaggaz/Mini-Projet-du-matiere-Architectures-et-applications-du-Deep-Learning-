@@ -1,6 +1,30 @@
-torch>=2.2.0
-torchvision>=0.17.0
+# ── Production dependencies (CPU-only) ──────────────────────────
+# torch and torchvision CPU wheels are fetched via:
+#   --extra-index-url https://download.pytorch.org/whl/cpu
+
+# Deep Learning (CPU-only — lighter image)
+torch==2.2.0
+torchvision==0.17.0
+
+# Numpy — required by PyTorch internally.
+# Pin strictly <2.0: torch 2.2.0 was compiled against numpy 1.x ABI.
+# numpy>=2.0 causes "Numpy is not available" at inference time.
+numpy>=1.24.0,<2.0
+
+# Image processing
 pillow>=10.0.0
+
+# API framework
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+
+# Metrics & monitoring
+prometheus-client>=0.20.0
+
+# Type validation
+pydantic>=2.7.0
+
 matplotlib>=3.8.0
 scikit-learn>=1.4.0
 PySimpleGUI>=4.60.0

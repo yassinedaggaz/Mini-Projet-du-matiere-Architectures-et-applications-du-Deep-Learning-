@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  test:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.test
+    container_name: dl-api-test
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MODEL_PATH=/app/models/best_model.pth
+      - CLASS_MAP_PATH=/app/models/class_to_idx.json
+    volumes:
+      - ./coverage:/app/coverage
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge
