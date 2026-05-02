@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Poster — Computer Hardware Image Classification</title>
+  <link rel="stylesheet" href="styles_en.css">
+</head>
+<body>
+  <div class="poster">
+    <header class="masthead">
+      <div class="title">Computer Hardware Image Classification</div>
+      <div class="subtitle">Transfer Learning with ResNet18 — Mini Project</div>
+      <div class="meta">Student · Module: Architectures & Applications of Deep Learning · May 2026</div>
+    </header>
+
+    <main class="content">
+      <section class="col left">
+        <h2>Abstract</h2>
+        <p>This project implements a complete pipeline for multi-class image classification of computer hardware images (keyboard, laptop, monitor, mouse) using transfer learning. The goal is to build a usable classifier, evaluate its performance and provide tools for inference and visualization.</p>
+
+        <h2>Dataset</h2>
+        <p>Data organized using PyTorch ImageFolder standard. Split used (default): train/val/test (70/15/15).</p>
+        <ul>
+          <li><strong>train:</strong> 43 images</li>
+          <li><strong>val:</strong> 8 images</li>
+          <li><strong>test:</strong> 12 images</li>
+        </ul>
+
+        <h2>Method</h2>
+        <p>ResNet18 pre-trained on ImageNet. The final fully-connected layer was replaced for 4 classes. Two modes supported:</p>
+        <ul>
+          <li>Transfer learning: freeze backbone, train FC</li>
+          <li>Fine-tuning (optional): unfreeze layer4 + train FC</li>
+        </ul>
+
+        <h2>Preprocessing & Augmentation</h2>
+        <ul>
+          <li>Train: RandomResizedCrop(224), RandomHorizontalFlip, ColorJitter</li>
+          <li>Val/Test: Resize(224,224), normalization (ImageNet mean/std)</li>
+        </ul>
+
+        <h2>Code & Tools</h2>
+        <p>Key scripts: <code>src/train.py</code>, <code>src/evaluate.py</code>, <code>src/predict.py</code>, <code>src/gui.py</code></p>
+      </section>
+
+      <section class="col right">
+        <h2>Results</h2>
+        <div class="metrics">
+          <div class="metric">
+            <div class="value">58.33%</div>
+            <div class="label">Test accuracy</div>
+          </div>
+          <div class="metric">
+            <div class="value">Macro F1: 0.646</div>
+            <div class="label">Macro F1</div>
+          </div>
+        </div>
+
+        <h3>Classification report (test)</h3>
+        <table class="report-table">
+          <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr></thead>
+          <tbody>
+            <tr><td>keyboard</td><td>1.000</td><td>1.000</td><td>1.000</td><td>1</td></tr>
+            <tr><td>laptop</td><td>0.500</td><td>0.250</td><td>0.333</td><td>4</td></tr>
+            <tr><td>monitor</td><td>0.750</td><td>0.750</td><td>0.750</td><td>4</td></tr>
+            <tr><td>mouse</td><td>0.400</td><td>0.667</td><td>0.500</td><td>3</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Figures</h2>
+        <div class="figures">
+          <figure>
+            <img src="../outputs/preprocessing_preview.png" alt="Preprocessing preview">
+            <figcaption>Preprocessing & augmentation preview (example)</figcaption>
+          </figure>
+
+          <figure>
+            <img src="../outputs/dataset_distribution.png" alt="Dataset distribution">
+            <figcaption>Image distribution by class (train / test)</figcaption>
+          </figure>
+        </div>
+
+        <h2>Error analysis</h2>
+        <p>Main confusions occur between <em>laptop, monitor</em> and <em>mouse</em>, likely due to limited variety and similar visual context. Confidence scores are moderate for several misclassified examples.</p>
+
+        <h2>Next steps</h2>
+        <ol>
+          <li>Gather and annotate more images (target: 100+ per class)</li>
+          <li>Systematic fine-tuning and hyperparameter search</li>
+          <li>Evaluate stronger backbones (EfficientNet / ConvNeXt)</li>
+          <li>Add cross-validation and larger test set for robust metrics</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <div>Repository & report: <a href="../RAPPORT_PROJET.md">RAPPORT_PROJET.md</a></div>
+      <div>Contact: student@example.com</div>
+    </footer>
+  </div>
+</body>
+</html>

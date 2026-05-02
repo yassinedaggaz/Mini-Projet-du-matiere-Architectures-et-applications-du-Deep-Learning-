@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Poster — Classification Materiel Informatique</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="poster">
+    <header class="masthead">
+      <div class="title">Classification d'images — Matériel Informatique</div>
+      <div class="subtitle">Transfer Learning (ResNet18) — Mini-projet</div>
+      <div class="meta">Étudiant · Module: Architectures et applications du Deep Learning · Mai 2026</div>
+    </header>
+
+    <main class="content">
+      <section class="col left">
+        <h2>Objectif</h2>
+        <p>Construire un classifieur multi-classe pour 4 catégories: <strong>keyboard, laptop, monitor, mouse</strong>.</p>
+
+        <h2>Datasets</h2>
+        <ul>
+          <li>train: 43 images</li>
+          <li>val: 8 images</li>
+          <li>test: 12 images</li>
+        </ul>
+
+        <h2>Méthode</h2>
+        <p>ResNet18 pré-entraîné (ImageNet). Transfer Learning (couche FC entraînée). Option de fine-tuning de layer4.</p>
+
+        <h2>Prétr./Augmentation</h2>
+        <ul>
+          <li>RandomResizedCrop, HorizontalFlip, ColorJitter (train)</li>
+          <li>Resize + Normalisation ImageNet (val/test)</li>
+        </ul>
+
+        <h2>Scripts importants</h2>
+        <p><code>src/train.py</code>, <code>src/evaluate.py</code>, <code>src/predict.py</code>, <code>src/gui.py</code></p>
+      </section>
+
+      <section class="col right">
+        <h2>Résultats</h2>
+        <div class="metrics">
+          <div class="metric">
+            <div class="value">58.33%</div>
+            <div class="label">Accuracy (test)</div>
+          </div>
+          <div class="metric">
+            <div class="value">Macro F1: 0.646</div>
+            <div class="label">Macro F1</div>
+          </div>
+        </div>
+
+        <h2>Classification report</h2>
+        <pre class="report">keyboard  precision 1.000  recall 1.000  f1 1.000
+laptop   precision 0.500  recall 0.250  f1 0.333
+monitor  precision 0.750  recall 0.750  f1 0.750
+mouse    precision 0.400  recall 0.667  f1 0.500
+</pre>
+
+        <h2>Figures</h2>
+        <div class="figures">
+          <figure>
+            <img src="../outputs/preprocessing_preview.png" alt="Preprocessing preview">
+            <figcaption>Prétraitement & augmentations (exemple)</figcaption>
+          </figure>
+
+          <figure>
+            <img src="../outputs/dataset_distribution.png" alt="Dataset distribution">
+            <figcaption>Distribution par classe (train / test)</figcaption>
+          </figure>
+        </div>
+
+        <h2>Conclusions & pistes</h2>
+        <ul>
+          <li>Dataset trop petit → augmenter les exemples (100+/classe recommandé)</li>
+          <li>Essayer fine-tuning et architectures modernes (EfficientNet)</li>
+          <li>Nettoyage et uniformisation des images</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <div>Code & outils: PyTorch, torchvision, scikit-learn</div>
+      <div>Fichiers: <a href="../RAPPORT_PROJET.md">RAPPORT_PROJET.md</a> · <a href="../results.csv">results.csv</a></div>
+    </footer>
+  </div>
+</body>
+</html>

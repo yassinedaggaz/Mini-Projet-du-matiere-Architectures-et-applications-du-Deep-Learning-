@@ -1,0 +1,50 @@
+/* English poster styles (more developed, print-friendly) */
+:root{
+  --bg:#ffffff;
+  --accent:#0b5fff;
+  --muted:#444;
+  --surface:#f7f9fb;
+  --max-width:1200px;
+}
+
+*{box-sizing:border-box}
+body{font-family:Verdana, Arial, Helvetica, sans-serif; margin:0; background:var(--surface); color:#222}
+.poster{max-width:var(--max-width); margin:30px auto; background:var(--bg); padding:28px; box-shadow:0 8px 36px rgba(0,0,0,0.08)}
+.masthead{border-bottom:8px solid var(--accent); padding-bottom:14px; margin-bottom:20px}
+.title{font-size:36px; font-weight:800; color:var(--accent)}
+.subtitle{font-size:16px; color:var(--muted); margin-top:6px}
+.meta{font-size:13px; color:#666; margin-top:6px}
+
+.content{display:flex; gap:28px}
+.col{flex:1}
+.col.left{max-width:50%}
+.col.right{max-width:50%}
+
+h2{color:var(--accent); margin-top:6px}
+.report-table{width:100%; border-collapse:collapse; margin-top:8px}
+.report-table th, .report-table td{border:1px solid #eee; padding:6px 8px; text-align:left}
+.report-table th{background:#f3f8ff}
+
+.metrics{display:flex; gap:14px; margin:8px 0 18px}
+.metric{background:#f1f8ff; padding:14px 18px; border-radius:8px; text-align:center; min-width:120px}
+.metric .value{font-size:22px; font-weight:800}
+.metric .label{font-size:13px; color:#555}
+
+.figures{display:flex; gap:12px; margin-top:8px}
+.figures figure{flex:1; margin:0; background:#fff; padding:10px; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.04)}
+.figures img{width:100%; height:auto; display:block; border-radius:4px}
+.figures figcaption{font-size:12px; color:#444; margin-top:6px}
+
+.col.left p, .col.right p{line-height:1.45}
+.foot{border-top:1px solid #eee; margin-top:18px; padding-top:12px; display:flex; justify-content:space-between; font-size:13px; color:#666}
+
+@media (max-width:980px){
+  .content{flex-direction:column}
+  .col.left,.col.right{max-width:100%}
+  .title{font-size:28px}
+}
+
+@media print{
+  body{background:white}
+  .poster{box-shadow:none; margin:0; padding:12mm}
+}
