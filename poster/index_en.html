@@ -3,101 +3,190 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Poster — Computer Hardware Image Classification</title>
+  <title>Smart Hardware Detector — Presentation Poster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles_en.css">
 </head>
 <body>
   <div class="poster">
+
+    <!-- ===== HEADER ===== -->
     <header class="masthead">
-      <div class="title">Computer Hardware Image Classification</div>
-      <div class="subtitle">Transfer Learning with ResNet18 — Mini Project</div>
-      <div class="meta">Student · Module: Architectures & Applications of Deep Learning · May 2026</div>
+      <div class="masthead-inner">
+        <div class="header-badge">Mini-Project · Deep Learning</div>
+        <h1 class="title">Smart Hardware Detector</h1>
+        <div class="subtitle">Computer Hardware Image Classification via Transfer Learning</div>
+        <div class="meta-row">
+          <span class="meta-chip">ResNet18 + ImageNet</span>
+          <span class="meta-chip">Transfer Learning</span>
+          <span class="meta-chip">PyTorch</span>
+        </div>
+        <div class="module-label">Module: Architectures &amp; Applications of Deep Learning</div>
+      </div>
     </header>
 
+    <!-- ===== CONTENT GRID ===== -->
     <main class="content">
+
+      <!-- ===== LEFT COLUMN ===== -->
       <section class="col left">
-        <h2>Abstract</h2>
-        <p>This project implements a complete pipeline for multi-class image classification of computer hardware images (keyboard, laptop, monitor, mouse) using transfer learning. The goal is to build a usable classifier, evaluate its performance and provide tools for inference and visualization.</p>
 
-        <h2>Dataset</h2>
-        <p>Data organized using PyTorch ImageFolder standard. Split used (default): train/val/test (70/15/15).</p>
-        <ul>
-          <li><strong>train:</strong> 43 images</li>
-          <li><strong>val:</strong> 8 images</li>
-          <li><strong>test:</strong> 12 images</li>
-        </ul>
+        <div class="card">
+          <div class="card-icon">🎯</div>
+          <h2>Abstract</h2>
+          <p>This project implements a complete pipeline for multi-class image classification of computer hardware (keyboard, laptop, monitor, mouse) using transfer learning. The goal is to build a usable classifier, evaluate its performance, and provide tools for inference and visualization.</p>
+          <div class="tag-row">
+            <span class="tag">keyboard</span>
+            <span class="tag">laptop</span>
+            <span class="tag">monitor</span>
+            <span class="tag">mouse</span>
+          </div>
+        </div>
 
-        <h2>Method</h2>
-        <p>ResNet18 pre-trained on ImageNet. The final fully-connected layer was replaced for 4 classes. Two modes supported:</p>
-        <ul>
-          <li>Transfer learning: freeze backbone, train FC</li>
-          <li>Fine-tuning (optional): unfreeze layer4 + train FC</li>
-        </ul>
+        <div class="card">
+          <div class="card-icon">🗃️</div>
+          <h2>Dataset</h2>
+          <div class="dataset-grid">
+            <div class="ds-item train">
+              <div class="ds-count">43</div>
+              <div class="ds-label">Train</div>
+            </div>
+            <div class="ds-item val">
+              <div class="ds-count">8</div>
+              <div class="ds-label">Validation</div>
+            </div>
+            <div class="ds-item test">
+              <div class="ds-count">12</div>
+              <div class="ds-label">Test</div>
+            </div>
+          </div>
+          <p class="note">Structured using PyTorch <code>ImageFolder</code> standard. Split: 70% / 15% / 15%.</p>
+        </div>
 
-        <h2>Preprocessing & Augmentation</h2>
-        <ul>
-          <li>Train: RandomResizedCrop(224), RandomHorizontalFlip, ColorJitter</li>
-          <li>Val/Test: Resize(224,224), normalization (ImageNet mean/std)</li>
-        </ul>
+        <div class="card">
+          <div class="card-icon">⚙️</div>
+          <h2>Method</h2>
+          <div class="method-steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>ResNet18 pre-trained on <strong>ImageNet</strong> — backbone frozen</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>Final FC layer replaced → <strong>4 class outputs</strong></div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>Optional <em>fine-tuning</em> of <code>layer4</code> for deeper adaptation</div>
+            </div>
+          </div>
+        </div>
 
-        <h2>Code & Tools</h2>
-        <p>Key scripts: <code>src/train.py</code>, <code>src/evaluate.py</code>, <code>src/predict.py</code>, <code>src/gui.py</code></p>
+        <div class="card">
+          <div class="card-icon">🔧</div>
+          <h2>Preprocessing &amp; Augmentation</h2>
+          <div class="aug-table">
+            <div class="aug-row header-row">
+              <span>Phase</span><span>Transforms</span>
+            </div>
+            <div class="aug-row">
+              <span class="phase-badge train-badge">Train</span>
+              <span>RandomResizedCrop(224) · HorizontalFlip · ColorJitter</span>
+            </div>
+            <div class="aug-row">
+              <span class="phase-badge test-badge">Val / Test</span>
+              <span>Resize(224) · ImageNet normalization (mean/std)</span>
+            </div>
+          </div>
+        </div>
+
       </section>
 
+      <!-- ===== RIGHT COLUMN ===== -->
       <section class="col right">
-        <h2>Results</h2>
-        <div class="metrics">
-          <div class="metric">
-            <div class="value">58.33%</div>
-            <div class="label">Test accuracy</div>
+
+        <div class="metrics-banner">
+          <div class="metric-big">
+            <div class="metric-value accent">58.33%</div>
+            <div class="metric-label">Test Accuracy</div>
           </div>
-          <div class="metric">
-            <div class="value">Macro F1: 0.646</div>
-            <div class="label">Macro F1</div>
+          <div class="metric-divider"></div>
+          <div class="metric-big">
+            <div class="metric-value secondary">0.646</div>
+            <div class="metric-label">Macro F1-Score</div>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-big">
+            <div class="metric-value tertiary">4</div>
+            <div class="metric-label">Classes</div>
           </div>
         </div>
 
-        <h3>Classification report (test)</h3>
-        <table class="report-table">
-          <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr></thead>
-          <tbody>
-            <tr><td>keyboard</td><td>1.000</td><td>1.000</td><td>1.000</td><td>1</td></tr>
-            <tr><td>laptop</td><td>0.500</td><td>0.250</td><td>0.333</td><td>4</td></tr>
-            <tr><td>monitor</td><td>0.750</td><td>0.750</td><td>0.750</td><td>4</td></tr>
-            <tr><td>mouse</td><td>0.400</td><td>0.667</td><td>0.500</td><td>3</td></tr>
-          </tbody>
-        </table>
-
-        <h2>Figures</h2>
-        <div class="figures">
-          <figure>
-            <img src="../outputs/preprocessing_preview.png" alt="Preprocessing preview">
-            <figcaption>Preprocessing & augmentation preview (example)</figcaption>
-          </figure>
-
-          <figure>
-            <img src="../outputs/dataset_distribution.png" alt="Dataset distribution">
-            <figcaption>Image distribution by class (train / test)</figcaption>
-          </figure>
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h2>Classification Report (Test Set)</h2>
+          <table class="report-table">
+            <thead>
+              <tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr>
+            </thead>
+            <tbody>
+              <tr class="row-good"><td>keyboard</td><td>1.000</td><td>1.000</td><td><strong>1.000</strong></td><td>1</td></tr>
+              <tr class="row-mid"><td>laptop</td><td>0.500</td><td>0.250</td><td><strong>0.333</strong></td><td>4</td></tr>
+              <tr class="row-good"><td>monitor</td><td>0.750</td><td>0.750</td><td><strong>0.750</strong></td><td>4</td></tr>
+              <tr class="row-mid"><td>mouse</td><td>0.400</td><td>0.667</td><td><strong>0.500</strong></td><td>3</td></tr>
+            </tbody>
+          </table>
         </div>
 
-        <h2>Error analysis</h2>
-        <p>Main confusions occur between <em>laptop, monitor</em> and <em>mouse</em>, likely due to limited variety and similar visual context. Confidence scores are moderate for several misclassified examples.</p>
+        <div class="card">
+          <div class="card-icon">🖼️</div>
+          <h2>Visualizations</h2>
+          <div class="figures">
+            <figure>
+              <img src="../outputs/preprocessing_preview.png" alt="Preprocessing preview">
+              <figcaption>Preprocessing &amp; augmentation preview</figcaption>
+            </figure>
+            <figure>
+              <img src="../outputs/dataset_distribution.png" alt="Dataset distribution">
+              <figcaption>Image distribution by class (train / test)</figcaption>
+            </figure>
+          </div>
+        </div>
 
-        <h2>Next steps</h2>
-        <ol>
-          <li>Gather and annotate more images (target: 100+ per class)</li>
-          <li>Systematic fine-tuning and hyperparameter search</li>
-          <li>Evaluate stronger backbones (EfficientNet / ConvNeXt)</li>
-          <li>Add cross-validation and larger test set for robust metrics</li>
-        </ol>
+        <div class="card">
+          <div class="card-icon">🔍</div>
+          <h2>Error Analysis &amp; Next Steps</h2>
+          <p style="margin-bottom:12px">Main confusions occur between <em>laptop</em>, <em>monitor</em>, and <em>mouse</em> — likely due to limited data variety and similar visual context.</p>
+          <ul class="insights-list">
+            <li><span class="insight-tag warn">Limit</span> Too few samples — target 100+ images per class</li>
+            <li><span class="insight-tag info">Next</span> Full fine-tuning + stronger backbones (EfficientNet)</li>
+            <li><span class="insight-tag info">Next</span> Systematic hyperparameter search &amp; cross-validation</li>
+            <li><span class="insight-tag info">Next</span> Data cleaning and image standardization</li>
+          </ul>
+        </div>
+
       </section>
     </main>
 
+    <!-- ===== FOOTER ===== -->
     <footer class="foot">
-      <div>Repository & report: <a href="../RAPPORT_PROJET.md">RAPPORT_PROJET.md</a></div>
-      <div>Contact: student@example.com</div>
+      <div class="foot-left">
+        <span class="foot-logo">🤖</span>
+        <span><strong>Smart Hardware Detector</strong> — Deep Learning Mini-Project</span>
+      </div>
+      <div class="foot-right">
+        <span>PyTorch</span>
+        <span class="sep">·</span>
+        <span>torchvision</span>
+        <span class="sep">·</span>
+        <span>scikit-learn</span>
+        <span class="sep">·</span>
+        <span>ResNet18</span>
+      </div>
     </footer>
+
   </div>
 </body>
 </html>

@@ -85,7 +85,8 @@ app = FastAPI(
     title="Deep Learning Image Classifier",
     description=(
         "ResNet18 Transfer Learning API — classifies computer hardware images "
-        "into 4 categories: keyboard, laptop, monitor, mouse."
+        "into 4 categories: keyboard, laptop, monitor, mouse." \
+        "\n\n Project by: Youssef Sdiri and Yassine Daggaz"
     ),
     version=get_version(),
     lifespan=lifespan,
